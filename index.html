@@ -38,7 +38,8 @@
   h2 { font-size: 1.25rem; margin-top: 2.25rem; border-bottom: 1px solid var(--card); padding-bottom: 0.35rem; }
   .updated { color: var(--muted); font-size: 0.9rem; margin-bottom: 2rem; }
   a { color: var(--accent); }
-  ul { padding-left: 1.25rem; }
+  code { font-size: 0.92em; }
+  ul, ol { padding-left: 1.25rem; }
   .summary {
     background: var(--card);
     border-radius: 12px;
@@ -51,7 +52,7 @@
 <body>
 <main>
   <h1>AniTimer Privacy Policy</h1>
-  <p class="updated">Last updated: July 19, 2026</p>
+  <p class="updated">Last updated: October 4, 2026</p>
 
   <div class="summary">
     <strong>In short:</strong> AniTimer does not collect, store, or share your personal
@@ -63,9 +64,12 @@
 
   <h2>Who we are</h2>
   <p>
-    AniTimer is an independent iOS app for browsing the weekly anime airing schedule and
-    managing your anime list on <a href="https://animeschedule.net">AnimeSchedule.net</a>.
-    AniTimer is not affiliated with, sponsored by, or endorsed by AnimeSchedule.net.
+    AniTimer is an independent iOS client for
+    <a href="https://animeschedule.net">AnimeSchedule.net</a>. It shows the public weekly
+    timetable and anime details from their API. If you sign in, it can also read and update
+    your AnimeSchedule list and profile through OAuth2, after you consent on their site.
+    AniTimer does not create its own account. It is not affiliated with, sponsored by, or
+    endorsed by AnimeSchedule.net, and it is not an official or partner app.
   </p>
 
   <h2>Data the app accesses</h2>
@@ -83,23 +87,34 @@
     Sign-in uses the industry-standard OAuth2 authorization flow (with PKCE) provided by
     AnimeSchedule.net. Your AnimeSchedule password is entered only on the AnimeSchedule
     website inside a secure system browser session — AniTimer never sees or stores your
-    password. The app receives access tokens, which are stored in the iOS Keychain on
-    your device only (they are not synced or backed up off-device by the app).
+    password. The app receives an access token, a refresh token, and your AnimeSchedule
+    user id. Those values are stored in the iOS Keychain on your device only. The app does
+    not sync or back them up to a server of its own.
+  </p>
+  <p>
+    List data that is not public (status, episode progress, scores, and dates) is used only
+    to show and edit your own list, including on the Home Screen widget on the same device.
+    AniTimer does not share that data with other users.
   </p>
 
   <h2>What is stored on your device</h2>
   <ul>
-    <li><strong>Sign-in tokens</strong> — in the iOS Keychain, until you sign out.</li>
-    <li><strong>Cached images</strong> — anime posters cached for up to 7 days (max 50 MB) to reduce network usage.</li>
-    <li><strong>Widget data</strong> — your favorited/tracked anime and their poster images, stored in the app's shared container so the Home Screen widget can display upcoming episodes.</li>
-    <li><strong>Preferences</strong> — settings such as dark mode, schedule timezone, and widget air type.</li>
+    <li><strong>Sign-in tokens and user id</strong> — in the iOS Keychain, until you sign out.</li>
+    <li><strong>Cached images</strong> — anime posters cached on the device for a short time to reduce network usage.</li>
+    <li><strong>Widget data</strong> — a copy of the anime you are tracking, plus small poster images, in the App Group container <code>group.anitimerwidget</code> so the Home Screen widget can show upcoming episodes.</li>
+    <li><strong>Local notifications</strong> — optional air-time alerts scheduled on this device. They are not sent through a server we operate.</li>
+    <li><strong>Preferences</strong> — dark mode, home filters, widget air type, and notification lead time, stored in UserDefaults on the device.</li>
   </ul>
-  <p>All of this is deleted when you delete the app.</p>
+  <p>
+    The timetable request includes your device’s timezone so week boundaries match your calendar.
+    That timezone is not saved as a separate account setting. Cached data is kept only as long as
+    the feature needs it. Deleting the app removes the local copies.
+  </p>
 
   <h2>What we do not do</h2>
   <ul>
     <li>We do not operate our own servers — no data about you is ever sent to us.</li>
-    <li>We do not use analytics, advertising, or tracking SDKs of any kind.</li>
+    <li>We do not use analytics, advertising, cookies, or tracking SDKs of any kind in the app. We do not use the App Tracking Transparency framework or an advertising identifier.</li>
     <li>We do not sell, share, or transfer your data to third parties.</li>
     <li>We do not use your data to train AI or machine learning models.</li>
   </ul>
@@ -110,21 +125,37 @@
     go directly from your device to their servers. Their handling of your account and
     data is governed by the
     <a href="https://animeschedule.net/privacy-notice">AnimeSchedule.net Privacy Notice</a>.
-    Managing or deleting your AnimeSchedule account is done on their website.
+    That notice describes the website, including any analytics, cookies, or vendors they use
+    there. Those practices are theirs. AniTimer does not run them inside the app.
+  </p>
+  <p>
+    Managing, downloading, or deleting your AnimeSchedule account is done on their website,
+    from profile settings. Email
+    <a href="mailto:contact@animeschedule.net">contact@animeschedule.net</a>
+    for anything the site cannot do.
   </p>
 
   <h2>Your choices and control</h2>
   <ul>
-    <li><strong>Sign out</strong> — signing out in the app revokes the app's access token with AnimeSchedule.net and removes it from your device.</li>
-    <li><strong>Revoke access</strong> — you can also revoke AniTimer's access at any time from your AnimeSchedule.net account settings.</li>
+    <li><strong>Remove titles</strong> — swipe a title off My List, or clear it from the anime detail screen. That updates your AnimeSchedule list.</li>
+    <li><strong>Sign out</strong> — Profile → sign out revokes the app’s access token with AnimeSchedule.net, deletes the tokens and user id from the Keychain, and removes the widget copy and scheduled air-time notifications from this device.</li>
+    <li><strong>Revoke access</strong> — you can also revoke AniTimer’s access from your AnimeSchedule.net account settings.</li>
     <li><strong>Delete everything local</strong> — deleting the app removes all locally stored data.</li>
   </ul>
 
-  <h2>Children</h2>
+  <h2>Deleting an account</h2>
   <p>
-    AniTimer does not knowingly collect personal information from anyone, including
-    children. Use of AnimeSchedule.net accounts is subject to AnimeSchedule.net's own
-    age requirements.
+    AniTimer has no account of its own to delete. To stop using the app and remove the data it can reach:
+  </p>
+  <ol>
+    <li>Remove titles in the app (My List, or the anime detail screen).</li>
+    <li>Sign out in Profile. That clears the Keychain session and the local widget data.</li>
+    <li>Download or permanently delete your <strong>AnimeSchedule</strong> account from profile settings on <a href="https://animeschedule.net">animeschedule.net</a>. Their <a href="https://animeschedule.net/privacy-notice">privacy notice</a> describes that process. Email <a href="mailto:contact@animeschedule.net">contact@animeschedule.net</a> for anything the website cannot do.</li>
+  </ol>
+
+  <h2>Age</h2>
+  <p>
+    AnimeSchedule accounts are for people <strong>13 and older</strong>. AniTimer is intended for the same audience. It is not directed at children under 13, and it does not knowingly collect personal information from anyone. If you are a parent and believe a child has used AnimeSchedule through this app, contact AnimeSchedule at <a href="mailto:contact@animeschedule.net">contact@animeschedule.net</a> and open an issue on the policy repository below.
   </p>
 
   <h2>Changes to this policy</h2>
