@@ -52,44 +52,72 @@
 <body>
 <main>
   <h1>AniTimer Privacy Policy</h1>
-  <p class="updated">Last updated: October 4, 2026</p>
+  <p class="updated">Last updated: November 25, 2026</p>
 
   <div class="summary">
-    <strong>In short:</strong> AniTimer does not collect, store, or share your personal
-    data on any server of its own. The app talks directly to
-    <a href="https://animeschedule.net">AnimeSchedule.net</a>, and everything it saves
-    (sign-in tokens, cached images, your list data for the widget) stays on your device.
-    There are no analytics, no ads, and no trackers.
+    <strong>In short:</strong> AniTimer does not create its own user accounts, does not use
+    analytics or ads, and does not sell your data. Public schedule and anime metadata
+    requests go through an AniTimer Cloudflare Worker (which then calls
+    <a href="https://animeschedule.net">AnimeSchedule.net</a>). Sign-in and your anime
+    list go only to AnimeSchedule.net over OAuth2. Tokens, widget copies, and preferences
+    stay on your device.
   </div>
 
   <h2>Who we are</h2>
   <p>
     AniTimer is an independent iOS client for
     <a href="https://animeschedule.net">AnimeSchedule.net</a>. It shows the public weekly
-    timetable and anime details from their API. If you sign in, it can also read and update
-    your AnimeSchedule list and profile through OAuth2, after you consent on their site.
+    timetable and anime details. If you sign in, it can also read and update your
+    AnimeSchedule list and profile through OAuth2, after you consent on their site.
     AniTimer does not create its own account. It is not affiliated with, sponsored by, or
     endorsed by AnimeSchedule.net, and it is not an official or partner app.
   </p>
 
-  <h2>Data the app accesses</h2>
-  <p>AniTimer accesses the following data through the official AnimeSchedule.net API:</p>
+  <h2>How the app talks to the network</h2>
+  <p>AniTimer is a client for AnimeSchedule. Traffic is split on purpose:</p>
   <ul>
-    <li><strong>Public anime data</strong> — weekly timetables, anime details, posters, and search results. This does not involve any personal data.</li>
-    <li><strong>Your AnimeSchedule account data (only if you sign in)</strong> — your anime list (statuses, episode progress, scores, notes), your public profile avatar, banner, and list statistics.</li>
+    <li>
+      <strong>Through the AniTimer Cloudflare Worker</strong> — timetable, search, anime
+      detail, profile header (avatar, banner, stats), and Home Screen widget “upcoming
+      episode” lookups. The Worker calls the AnimeSchedule public API using an application
+      token that never ships inside the iOS app. The IP address on those Worker requests is
+      used only as the rate-limit key. Responses may be cached briefly on the Worker to
+      reduce load; AniTimer does not use that path to store your anime list.
+    </li>
+    <li>
+      <strong>Directly to AnimeSchedule.net</strong> — sign-in (OAuth2 with PKCE) and all
+      anime-list read/write calls (<code>/animelists/oauth/...</code>). List changes and
+      tokens are not sent to the AniTimer Worker.
+    </li>
+    <li>
+      <strong>Image hosts</strong> — poster and some profile images may load from
+      AnimeSchedule image URLs (for example <code>img.animeschedule.net</code>) so the app
+      can show artwork.
+    </li>
   </ul>
   <p>
-    Signing in is optional. Without signing in, the app only fetches public anime data.
+    Schedule data is from <a href="https://animeschedule.net">AnimeSchedule</a>. Their
+    privacy notice is at
+    <a href="https://animeschedule.net/privacy-notice">animeschedule.net/privacy-notice</a>.
+  </p>
+
+  <h2>Data the app accesses</h2>
+  <ul>
+    <li><strong>Public anime data</strong> — weekly timetables, anime details, posters, and search results. This does not require signing in.</li>
+    <li><strong>Your AnimeSchedule account data (only if you sign in)</strong> — your anime list (statuses, episode progress, scores, notes), and your public profile avatar, banner, and list statistics.</li>
+  </ul>
+  <p>
+    Signing in is optional. Without signing in, the app only fetches public anime data
+    (via the Worker) and cannot show or edit your list.
   </p>
 
   <h2>How sign-in works</h2>
   <p>
-    Sign-in uses the industry-standard OAuth2 authorization flow (with PKCE) provided by
-    AnimeSchedule.net. Your AnimeSchedule password is entered only on the AnimeSchedule
-    website inside a secure system browser session — AniTimer never sees or stores your
-    password. The app receives an access token, a refresh token, and your AnimeSchedule
-    user id. Those values are stored in the iOS Keychain on your device only. The app does
-    not sync or back them up to a server of its own.
+    Sign-in uses OAuth2 with PKCE provided by AnimeSchedule.net. Your AnimeSchedule
+    password is entered only on the AnimeSchedule website inside a secure system browser
+    session — AniTimer never sees or stores your password. The app receives an access
+    token, a refresh token, and your AnimeSchedule user id. Those values are stored in the
+    iOS Keychain on your device only.
   </p>
   <p>
     List data that is not public (status, episode progress, scores, and dates) is used only
@@ -101,44 +129,48 @@
   <ul>
     <li><strong>Sign-in tokens and user id</strong> — in the iOS Keychain, until you sign out.</li>
     <li><strong>Cached images</strong> — anime posters cached on the device for a short time to reduce network usage.</li>
-    <li><strong>Widget data</strong> — a copy of the anime you are tracking, plus small poster images, in the App Group container <code>group.anitimerwidget</code> so the Home Screen widget can show upcoming episodes.</li>
-    <li><strong>Local notifications</strong> — optional air-time alerts scheduled on this device. They are not sent through a server we operate.</li>
-    <li><strong>Preferences</strong> — dark mode, home filters, widget air type, and notification lead time, stored in UserDefaults on the device.</li>
+    <li><strong>Widget data</strong> — a copy of the anime you are tracking, plus small poster images, in the App Group container <code>group.anitimerwidgety</code> so the Home Screen widget can show upcoming episodes.</li>
+    <li><strong>Local notifications</strong> — optional air-time alerts scheduled on this device. They are not sent through a push server operated by AniTimer.</li>
+    <li><strong>Preferences</strong> — dark mode, home filters, widget air type, notification lead time, and similar settings, stored in UserDefaults on the device (including the App Group where needed for the widget).</li>
   </ul>
   <p>
-    The timetable request includes your device’s timezone so week boundaries match your calendar.
-    That timezone is not saved as a separate account setting. Cached data is kept only as long as
-    the feature needs it. Deleting the app removes the local copies.
+    The timetable request includes your device’s timezone so week boundaries match your
+    calendar. That timezone is not saved as a separate AniTimer account setting. Cached
+    data is kept only as long as the feature needs it. Deleting the app removes the local
+    copies.
   </p>
 
   <h2>What we do not do</h2>
   <ul>
-    <li>We do not operate our own servers — no data about you is ever sent to us.</li>
-    <li>We do not use analytics, advertising, cookies, or tracking SDKs of any kind in the app. We do not use the App Tracking Transparency framework or an advertising identifier.</li>
-    <li>We do not sell, share, or transfer your data to third parties.</li>
-    <li>We do not use your data to train AI or machine learning models.</li>
+    <li>We do <strong>not</strong> create an AniTimer account or keep a copy of your anime list on AniTimer servers.</li>
+    <li>We do <strong>not</strong> use analytics, advertising, cookies, or tracking SDKs in the app. We do not use App Tracking Transparency or an advertising identifier.</li>
+    <li>We do <strong>not</strong> sell, share, or transfer your data for advertising or cross-context tracking.</li>
+    <li>We do <strong>not</strong> use your data to train AI or machine learning models.</li>
+    <li>We do <strong>not</strong> claim AnimeSchedule website practices (for example Google Analytics or cookies on their site) as AniTimer practices. Those are described in their notice, not run inside this app.</li>
   </ul>
 
   <h2>Third-party service: AnimeSchedule.net</h2>
   <p>
-    All anime and account data comes from AnimeSchedule.net, and requests made by the app
-    go directly from your device to their servers. Their handling of your account and
-    data is governed by the
+    Anime and account data ultimately come from AnimeSchedule.net. Public metadata
+    requests are proxied by the AniTimer Cloudflare Worker as described above; list and
+    sign-in traffic go from your device to AnimeSchedule. Their handling of your account
+    and data is governed by the
     <a href="https://animeschedule.net/privacy-notice">AnimeSchedule.net Privacy Notice</a>.
-    That notice describes the website, including any analytics, cookies, or vendors they use
-    there. Those practices are theirs. AniTimer does not run them inside the app.
   </p>
   <p>
     Managing, downloading, or deleting your AnimeSchedule account is done on their website,
     from profile settings. Email
     <a href="mailto:contact@animeschedule.net">contact@animeschedule.net</a>
-    for anything the site cannot do.
+    for anything the site cannot do. Optional website cookie / analytics choices for
+    <em>their</em> site may be available at
+    <a href="https://animeschedule.net/consent">animeschedule.net/consent</a> — that is not
+    an in-app AniTimer control.
   </p>
 
   <h2>Your choices and control</h2>
   <ul>
     <li><strong>Remove titles</strong> — swipe a title off My List, or clear it from the anime detail screen. That updates your AnimeSchedule list.</li>
-    <li><strong>Sign out</strong> — Profile → sign out revokes the app’s access token with AnimeSchedule.net, deletes the tokens and user id from the Keychain, and removes the widget copy and scheduled air-time notifications from this device.</li>
+    <li><strong>Sign out</strong> — Profile → sign out revokes the app’s access with AnimeSchedule.net where applicable, deletes the tokens and user id from the Keychain, and removes the widget copy and scheduled air-time notifications from this device.</li>
     <li><strong>Revoke access</strong> — you can also revoke AniTimer’s access from your AnimeSchedule.net account settings.</li>
     <li><strong>Delete everything local</strong> — deleting the app removes all locally stored data.</li>
   </ul>
@@ -155,12 +187,17 @@
 
   <h2>Age</h2>
   <p>
-    AnimeSchedule accounts are for people <strong>13 and older</strong>. AniTimer is intended for the same audience. It is not directed at children under 13, and it does not knowingly collect personal information from anyone. If you are a parent and believe a child has used AnimeSchedule through this app, contact AnimeSchedule at <a href="mailto:contact@animeschedule.net">contact@animeschedule.net</a> and open an issue on the policy repository below.
+    AnimeSchedule accounts are for people <strong>13 and older</strong>. AniTimer is
+    intended for the same audience. It is not directed at children under 13, and it does
+    not knowingly collect personal information from children. If you are a parent and
+    believe a child has used AnimeSchedule through this app, contact AnimeSchedule at
+    <a href="mailto:contact@animeschedule.net">contact@animeschedule.net</a>
+    and open an issue on the policy repository below.
   </p>
 
   <h2>Changes to this policy</h2>
   <p>
-    If the app's data practices change, this page will be updated and the "Last updated"
+    If the app’s data practices change, this page will be updated and the “Last updated”
     date revised. The history of changes is publicly visible in the
     <a href="https://github.com/johngbarreto/AniTimerPrivacyPolicy">policy repository</a>.
   </p>
